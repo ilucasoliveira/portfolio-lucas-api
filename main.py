@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import ContactForm
 from email_service import send_email, EmailDeliveryError
@@ -17,6 +17,14 @@ origins = [
     "http://localhost:5173",
     "https://lucasdeoliveira.vercel.app",
 ]
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
+@app.head("/ping")
+def ping_head():
+    return Response()
 
 app.add_middleware(
     CORSMiddleware,
