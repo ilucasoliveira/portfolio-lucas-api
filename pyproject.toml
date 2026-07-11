@@ -1,7 +1,7 @@
 [project]
 name = "portfolio-lucas-api"
 version = "0.1.0"
-description = "REST API that delivers portfolio contact messages via email
+description = "REST API that delivers portfolio contact messages via email"
 authors = [
     {name = "Lucas",email = "lucasdeoliveira937@gmail.com"}
 ]
