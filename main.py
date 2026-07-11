@@ -1,8 +1,7 @@
-import smtplib
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import ContactForm
-from email_service import send_email
+from email_service import send_email, EmailDeliveryError
 
 app = FastAPI(
     title="Lucas' API Portfolio",
@@ -30,7 +29,7 @@ def create_message(contact: ContactForm):
     
     try:
         send_email(contact)
-    except smtplib.SMTPException:
+    except EmailDeliveryError:
         raise HTTPException(status_code=503, detail="Message service temporarily unavailable. Please try again later.")
     
     return {"detail":"The message has been sent successfully!"}

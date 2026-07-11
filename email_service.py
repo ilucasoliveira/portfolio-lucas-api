@@ -1,30 +1,32 @@
 import os
-import smtplib
-from email.message import EmailMessage
+import resend
 from dotenv import load_dotenv
 
 load_dotenv()
 
+resend.api_key = os.getenv("RESEND_API_KEY")
 USER = os.getenv("GMAIL_USER")
-PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+
+class EmailDeliveryError(Exception):
+    """Raised when the email could not be delivered."""
 
 def send_email(contact):
-    msg = EmailMessage()
-    msg["Subject"] = contact.subject
-    msg["From"] = USER
-    msg["To"] = USER
-    msg["Reply-To"] = contact.email
-    msg.set_content(
-        f"""Nova mensagem do portfólio!
+    try:
+        resend.Emails.send(
+            {
+                "from": "Portfolio <onboarding@resend.dev>",
+                "to": USER,
+                "reply_to": contact.email,
+                "subject": contact.subject,
+                "text": f"""Nova mensagem do portfólio!
 
 Nome: {contact.name}
 Email: {contact.email}
 
 Mensagem:
 {contact.message}
-"""
-    )
-    
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
-        server.login(USER, PASSWORD)
-        server.send_message(msg)
+""",
+            }
+        )
+    except Exception as error:
+        raise EmailDeliveryError from error
