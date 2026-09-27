@@ -16,6 +16,7 @@ app = FastAPI(
 origins = [
     "http://localhost:5173",
     "https://lucasdeoliveira.vercel.app",
+    "https://ilucasoliveira.dev",
 ]
 
 @app.get("/ping")
