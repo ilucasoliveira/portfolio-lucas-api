@@ -63,12 +63,12 @@ app.add_middleware(
 SUCCESS_RESPONSE = {"detail": "The message has been sent successfully!"}
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def health_check():
     return {"status": "ok"}
 
 
-@app.get("/ping")
+@app.api_route("/ping", methods=["GET", "HEAD"])
 def ping():
     return {"status": "ok"}
 

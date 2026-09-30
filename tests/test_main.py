@@ -89,3 +89,8 @@ def test_delivery_failure_returns_503(monkeypatch):
     response = client.post("/message", json=VALID_MESSAGE)
 
     assert response.status_code == 503
+
+
+def test_health_check_accepts_head():
+    assert client.head("/").status_code == 200
+    assert client.head("/ping").status_code == 200
