@@ -1,9 +1,12 @@
+import logging
 import os
 
 import resend
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 resend.api_key = os.getenv("RESEND_API_KEY")
 USER = os.getenv("GMAIL_USER")
@@ -33,4 +36,5 @@ Mensagem:
             }
         )
     except Exception as error:
+        logger.exception("Failed to deliver contact email via Resend")
         raise EmailDeliveryError from error

@@ -1,10 +1,19 @@
+import logging
+
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from fastapi.responses import JSONResponse
+from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 
 from schemas import ContactForm
 from email_service import send_email, EmailDeliveryError
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def get_client_ip(request: Request) -> str:
@@ -27,7 +36,16 @@ app = FastAPI(
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    logger.warning("Rate limit exceeded for %s", get_client_ip(request))
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many messages. Please try again later."},
+    )
+
 
 origins = [
     "http://localhost:5173",
@@ -64,6 +82,7 @@ def ping_head():
 @limiter.limit("3/minute;10/day")
 def create_message(request: Request, contact: ContactForm):
     if contact.website:
+        logger.info("Honeypot triggered, message discarded")
         return SUCCESS_RESPONSE
 
     try:
